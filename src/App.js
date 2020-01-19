@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Signin from './pages/Signin';
-import NotFound from './pages/NotFound';
 import ErrorBoundary from 'react-error-boundary';
+import NotFound from './pages/NotFound';
 
 const ErrorFallbackComponent = ({ error }) => <div>{error.message}</div>;
 

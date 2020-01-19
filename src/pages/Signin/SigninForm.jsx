@@ -1,6 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Row, Col } from 'antd';
+import styled from 'styled-components';
 
 const StyledCol = styled(Col).attrs(() => ({
   span: 12,

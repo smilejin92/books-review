@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Col } from 'antd';
 import bgSignin from './images/bg_signin.png';
+import { Col } from 'antd';
 
 const StyledCol = styled(Col).attrs(() => ({
   span: 12,
