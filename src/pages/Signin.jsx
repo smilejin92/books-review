@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Row, Col } from 'antd';
-import SigninBg from './SigninBg';
-import SigninForm from './SigninForm';
+import SigninBg from '../components/SigninBg';
+import SigninForm from '../components/SigninForm';
 
 const StyledRow = styled(Row).attrs(() => ({
   type: 'flex',
@@ -43,6 +43,9 @@ const StyledContent = styled(Row).attrs(() => ({
 `;
 
 export default function Signin() {
+  const token = localStorage.getItem('token');
+  if (token) return <div>이미 로그인되어 있습니다.</div>;
+
   return (
     <StyledRow>
       <StyledCol>
