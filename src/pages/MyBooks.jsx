@@ -4,19 +4,24 @@ import withAuth from '../hocs/withAuth.js';
 import Header from '../components/Header.jsx';
 import AddBookForm from '../components/AddBookForm.jsx';
 
-function MyBooks(props) {
+function MyBooks({ token }) {
   const [books, setBooks] = useState([]);
   const [addBook, setAddBook] = useState(false);
 
   useEffect(() => {
-    axios
-      .get('https://api.marktube.tv/v1/book', {
-        headers: {
-          Authorization: `Bearer ${props.token}`,
-        },
-      })
-      .then(res => setBooks(res.data));
-  }, [props.token]);
+    (async () => {
+      try {
+        const { data } = await axios.get('https://api.marktube.tv/v1/book', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setBooks(data);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [token]);
 
   const handleAddButton = () => {
     setAddBook(!addBook);

@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import axios from 'axios';
 import withAuth from '../hocs/withAuth';
 
 function AddBookForm(props) {
-  const titleRef = React.createRef();
-  const messageRef = React.createRef();
-  const authorRef = React.createRef();
-  const urlRef = React.createRef();
+  const titleRef = useRef();
+  const messageRef = useRef();
+  const authorRef = useRef();
+  const urlRef = useRef();
 
   const resetInput = () => {
     titleRef.current.value = '';
@@ -15,26 +15,29 @@ function AddBookForm(props) {
     urlRef.current.value = '';
   };
 
-  const handleAddForm = e => {
+  const handleAddForm = async e => {
     e.preventDefault();
-    axios
-      .post(
+
+    try {
+      const { data } = await axios.post(
         'https://api.marktube.tv/v1/book',
         {
-          title: titleRef.current.value,
-          message: messageRef.current.value,
-          author: authorRef.current.value,
-          url: urlRef.current.value,
+          title: titleRef.current.value || '',
+          message: messageRef.current.value || '',
+          author: authorRef.current.value || '',
+          url: urlRef.current.value || '',
         },
         {
           headers: {
             Authorization: `Bearer ${props.token}`,
           },
         },
-      )
-      .then(res => props.setBooks(prev => [...prev, res.data]))
-      .catch(err => console.log(err));
-    resetInput();
+      );
+      props.setBooks(prev => [...prev, data]);
+      resetInput();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
