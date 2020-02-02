@@ -1,6 +1,4 @@
 import React from 'react';
-// import { NavLink } from 'react-router-dom';
-// import axios from 'axios';
 import withAuth from '../hocs/withAuth';
 import Header from '../components/Header';
 
