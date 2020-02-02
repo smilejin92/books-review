@@ -4,7 +4,7 @@ import withAuth from '../hocs/withAuth.js';
 import Header from '../components/Header.jsx';
 import AddBookForm from '../components/AddBookForm.jsx';
 
-function MyBooks({ token }) {
+function MyBooks({ token, setToken }) {
   const [books, setBooks] = useState([]);
   const [addBook, setAddBook] = useState(false);
 
@@ -23,13 +23,13 @@ function MyBooks({ token }) {
     })();
   }, [token]);
 
-  const handleAddButton = () => {
+  function handleAddButton() {
     setAddBook(!addBook);
-  };
+  }
 
   return (
     <>
-      <Header />
+      <Header token={token} setToken={setToken} />
       <section>
         <h2>내 서재</h2>
         <ul>

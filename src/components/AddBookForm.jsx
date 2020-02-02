@@ -2,20 +2,20 @@ import React, { useRef } from 'react';
 import axios from 'axios';
 import withAuth from '../hocs/withAuth';
 
-function AddBookForm(props) {
+function AddBookForm({ token, setBooks }) {
   const titleRef = useRef();
   const messageRef = useRef();
   const authorRef = useRef();
   const urlRef = useRef();
 
-  const resetInput = () => {
+  function resetInput() {
     titleRef.current.value = '';
     messageRef.current.value = '';
     authorRef.current.value = '';
     urlRef.current.value = '';
-  };
+  }
 
-  const handleAddForm = async e => {
+  async function handleAddForm(e) {
     e.preventDefault();
 
     try {
@@ -29,16 +29,16 @@ function AddBookForm(props) {
         },
         {
           headers: {
-            Authorization: `Bearer ${props.token}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       );
-      props.setBooks(prev => [...prev, data]);
+      setBooks(prev => [...prev, data]);
       resetInput();
     } catch (e) {
       console.error(e);
     }
-  };
+  }
 
   return (
     <form onSubmit={handleAddForm}>

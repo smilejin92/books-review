@@ -1,18 +1,18 @@
 import React from 'react';
+// import { NavLink } from 'react-router-dom';
+// import axios from 'axios';
 import withAuth from '../hocs/withAuth';
-import Header from '../components/Header.jsx';
+import Header from '../components/Header';
 
-function Home() {
-  return (
-    <>
-      <Header />
-      <main>
-        <section>
-          <h2>홈</h2>
-        </section>
-      </main>
-    </>
-  );
-}
+const Home = ({ token, setToken }) => (
+  <>
+    <Header token={token} setToken={setToken} />
+    <main>
+      <section>
+        <h2>홈</h2>
+      </section>
+    </main>
+  </>
+);
 
 export default withAuth(Home);

@@ -84,13 +84,13 @@ const StyledButton = styled.button`
   text-transform: uppercase;
 `;
 
-const SigninForm = () => {
+function SigninForm() {
   const emailRef = React.createRef();
   const passwordRef = React.createRef();
   const history = useHistory();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async e => {
+  async function handleSubmit(e) {
     e.preventDefault();
     try {
       setLoading(true);
@@ -115,7 +115,7 @@ const SigninForm = () => {
         message.error('Sign in error');
       }
     }
-  };
+  }
 
   return (
     <StyledCol>
@@ -142,6 +142,6 @@ const SigninForm = () => {
       </StyledForm>
     </StyledCol>
   );
-};
+}
 
 export default SigninForm;
