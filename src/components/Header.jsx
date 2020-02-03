@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
+import { removeToken, setBooks } from '../actions';
+import { connect } from 'react-redux';
 
-function Header({ token, setToken }) {
-  async function removeToken() {
+function Header({ token, removeToken, setBooks }) {
+  async function handleClick() {
     try {
       await axios.delete('https://api.marktube.tv/v1/me', {
         headers: {
@@ -11,7 +13,8 @@ function Header({ token, setToken }) {
         },
       });
       localStorage.removeItem('token');
-      setToken(false);
+      removeToken();
+      setBooks([]);
     } catch (e) {
       console.error(e);
     }
@@ -33,7 +36,7 @@ function Header({ token, setToken }) {
             </NavLink>
           </li>
           <li>
-            <button onClick={removeToken}>로그아웃</button>
+            <button onClick={handleClick}>로그아웃</button>
           </li>
         </ul>
       </nav>
@@ -41,4 +44,15 @@ function Header({ token, setToken }) {
   );
 }
 
-export default Header;
+function mapDispatchToProps(dispatch) {
+  return {
+    removeToken: () => {
+      dispatch(removeToken());
+    },
+    setBooks: books => {
+      dispatch(setBooks(books));
+    },
+  };
+}
+
+export default connect(null, mapDispatchToProps)(Header);

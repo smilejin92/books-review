@@ -3,49 +3,110 @@ import axios from 'axios';
 import withAuth from '../hocs/withAuth.js';
 import Header from '../components/Header.jsx';
 import AddBookForm from '../components/AddBookForm.jsx';
+import {
+  addBook,
+  setBooks,
+  setLoading,
+  endLoading,
+  setError,
+  clearError,
+} from '../actions/index.js';
+import { connect } from 'react-redux';
 
-function MyBooks({ token, setToken }) {
-  const [books, setBooks] = useState([]);
-  const [addBook, setAddBook] = useState(false);
+function MyBooks({
+  token,
+  books,
+  loading,
+  error,
+  setBooks,
+  addBook,
+  setLoading,
+  endLoading,
+  setError,
+  clearError,
+}) {
+  const [bookForm, setBookForm] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
+        clearError();
+        setLoading();
+
         const { data } = await axios.get('https://api.marktube.tv/v1/book', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setBooks(data);
+        endLoading();
       } catch (e) {
-        console.error(e);
+        setError(e.message);
+        endLoading();
       }
     })();
-  }, [token]);
+  }, [clearError, endLoading, setBooks, setError, setLoading, token]);
 
   function handleAddButton() {
-    setAddBook(!addBook);
+    setBookForm(!bookForm);
   }
 
   return (
     <>
-      <Header token={token} setToken={setToken} />
+      <Header token={token} />
       <section>
-        <h2>내 서재</h2>
-        <ul>
-          {books.map(book => (
-            <li key={book.bookId}>{book.title}</li>
-          ))}
-        </ul>
-        <div>
-          <button onClick={handleAddButton}>
-            {addBook ? '취소' : '책 추가하기'}
-          </button>
-          {addBook && <AddBookForm setBooks={setBooks} />}
-        </div>
+        <h2>내 서재 {loading && <span>로딩 중...</span>}</h2>
+        {error ? (
+          <div>요청에 실패했습니다.</div>
+        ) : (
+          <>
+            <ul>
+              {books.map(book => (
+                <li key={book.bookId}>{book.title}</li>
+              ))}
+            </ul>
+            <div>
+              <button onClick={handleAddButton}>
+                {bookForm ? '취소' : '책 추가하기'}
+              </button>
+              {bookForm && <AddBookForm token={token} addBook={addBook} />}
+            </div>
+          </>
+        )}
       </section>
     </>
   );
 }
+function mapStateToProps(state) {
+  return {
+    token: state.token,
+    books: state.books,
+    loading: state.loading,
+    error: state.error,
+  };
+}
 
-export default withAuth(MyBooks);
+function mapDispatchToProps(dispatch) {
+  return {
+    setLoading: () => {
+      dispatch(setLoading());
+    },
+    endLoading: () => {
+      dispatch(endLoading());
+    },
+    setError: error => {
+      dispatch(setError(error));
+    },
+    clearError: () => {
+      dispatch(clearError());
+    },
+    setBooks: books => {
+      dispatch(setBooks(books));
+    },
+    addBook: book => {
+      dispatch(addBook(book));
+    },
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withAuth(MyBooks));
