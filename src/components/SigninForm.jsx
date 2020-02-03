@@ -1,99 +1,44 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Row, Col, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
-import { useState } from 'react';
+import { connect } from 'react-redux';
+import {
+  setLoading,
+  endLoading,
+  setError,
+  clearError,
+  setToken,
+} from '../actions';
+import { message } from 'antd';
+import {
+  StyledCol,
+  StyledTitle,
+  StyledForm,
+  StyledLabel,
+  StyledInput,
+  SiginButton,
+  Underline,
+  StyledRow,
+  StyledButton,
+} from './styled';
 
-const StyledCol = styled(Col).attrs(() => ({
-  span: 12,
-}))`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const StyledTitle = styled.div`
-  text-align: center;
-  font-size: 27px;
-  font-weight: bold;
-  text-transform: uppercase;
-`;
-
-const StyledForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  padding: 0 30px 30px 30px;
-  height: 400px;
-  justify-content: space-around;
-`;
-
-const StyledLabel = styled.label.attrs(({ htmlFor }) => ({
-  htmlFor,
-}))`
-  display: block;
-  font-weight: bold;
-  padding-bottom: 8px;
-
-  &::after {
-    content: '*';
-    color: red;
-  }
-`;
-
-const StyledInput = styled.input.attrs(({ id, type }) => ({
-  id,
-  type,
-}))`
-  width: 100%;
-  border-radius: 1px;
-  border-width: 1px;
-  font-family: Roboto;
-  padding-left: 5px;
-`;
-
-const SiginButton = styled.button.attrs(({ disabled }) => ({
-  disabled,
-}))`
-  width: 150px;
-  height: 50px;
-  background-color: #003366;
-  color: white;
-  font-size: 16px;
-  text-transform: uppercase;
-`;
-
-const Underline = styled.div`
-  height: 1px;
-  background: #ccc;
-`;
-
-const StyledRow = styled(Row).attrs(() => ({
-  type: 'flex',
-  justify: 'space-between',
-}))``;
-
-const StyledButton = styled.button`
-  height: 30px;
-  color: #003366;
-  background: transparent;
-  padding: 0 10px;
-  border: 2px solid #003366;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-`;
-
-function SigninForm() {
+function SigninForm({
+  loading,
+  setLoading,
+  endLoading,
+  setError,
+  clearError,
+  setToken,
+}) {
   const emailRef = React.createRef();
   const passwordRef = React.createRef();
   const history = useHistory();
-  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      setLoading(true);
+      clearError();
+      setLoading();
       const email = emailRef.current.value;
       const password = passwordRef.current.value;
       const response = await axios.post('https://api.marktube.tv/v1/me', {
@@ -101,12 +46,14 @@ function SigninForm() {
         password,
       });
       const { token } = response.data;
-      setLoading(false);
+      endLoading();
       localStorage.setItem('token', token);
+      setToken(token);
       history.push('/');
     } catch (e) {
-      setLoading(false);
+      endLoading();
       const { error } = e.response.data;
+      setError(error);
       if (error === 'PASSWORD_NOT_MATCH') {
         message.error('Incorrect Password');
       } else if (error === 'USER_NOT_EXIST') {
@@ -144,4 +91,30 @@ function SigninForm() {
   );
 }
 
-export default SigninForm;
+function mapStateToProps(state) {
+  return {
+    loading: state.loading,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    setLoading: () => {
+      dispatch(setLoading());
+    },
+    endLoading: () => {
+      dispatch(endLoading());
+    },
+    setError: error => {
+      dispatch(setError(error));
+    },
+    clearError: () => {
+      dispatch(clearError());
+    },
+    setToken: token => {
+      dispatch(setToken(token));
+    },
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SigninForm);
