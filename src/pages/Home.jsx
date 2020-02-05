@@ -1,12 +1,11 @@
 import React from 'react';
 import withAuth from '../hocs/withAuth';
-import Header from '../components/Header';
-import { connect } from 'react-redux';
+import HeaderContainer from '../components/containers/HeaderContainer';
 
-function Home({ token }) {
+function Home() {
   return (
     <>
-      <Header token={token} />
+      <HeaderContainer />
       <main>
         <section>
           <h2>홈</h2>
@@ -16,10 +15,4 @@ function Home({ token }) {
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    token: state.token,
-  };
-}
-
-export default connect(mapStateToProps)(withAuth(Home));
+export default withAuth(Home);

@@ -1,23 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
-import { removeToken, setBooks } from '../actions';
-import { connect } from 'react-redux';
 
-function Header({ token, removeToken, setBooks }) {
+function Header({ token, logout }) {
   async function handleClick() {
     try {
-      await axios.delete('https://api.marktube.tv/v1/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      localStorage.removeItem('token');
-      removeToken();
-      setBooks([]);
-    } catch (e) {
-      console.error(e);
-    }
+      await logout(token);
+    } catch {}
   }
 
   return (
@@ -44,15 +32,4 @@ function Header({ token, removeToken, setBooks }) {
   );
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    removeToken: () => {
-      dispatch(removeToken());
-    },
-    setBooks: books => {
-      dispatch(setBooks(books));
-    },
-  };
-}
-
-export default connect(null, mapDispatchToProps)(Header);
+export default Header;

@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import axios from 'axios';
 
 function AddBookForm({ token, addBook }) {
   const titleRef = useRef();
@@ -18,25 +17,14 @@ function AddBookForm({ token, addBook }) {
     e.preventDefault();
 
     try {
-      const { data } = await axios.post(
-        'https://api.marktube.tv/v1/book',
-        {
-          title: titleRef.current.value || '',
-          message: messageRef.current.value || '',
-          author: authorRef.current.value || '',
-          url: urlRef.current.value || '',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      addBook(data);
+      await addBook(token, {
+        title: titleRef.current.value || '',
+        message: messageRef.current.value || '',
+        author: authorRef.current.value || '',
+        url: urlRef.current.value || '',
+      });
       resetInput();
-    } catch (e) {
-      console.error(e);
-    }
+    } catch {}
   }
 
   return (

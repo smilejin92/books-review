@@ -5,20 +5,20 @@ import Signin from './pages/Signin.jsx';
 import NotFound from './pages/NotFound.jsx';
 import MyBooks from './pages/MyBooks.jsx';
 import ErrorBoundary from 'react-error-boundary';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import reducers from './reducers';
+import thunk from 'redux-thunk';
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 const ErrorFallbackComponent = ({ error }) => <div>{error.message}</div>;
+const store = createStore(
+  reducers,
+  composeWithDevTools(applyMiddleware(thunk)),
+);
 
 const App = () => (
-  <Provider
-    store={createStore(
-      reducers,
-      window.__REDUX_DEVTOOLS_EXTENSION__ &&
-        window.__REDUX_DEVTOOLS_EXTENSION__(),
-    )}
-  >
+  <Provider store={store}>
     <ErrorBoundary FallbackComponent={ErrorFallbackComponent}>
       <BrowserRouter>
         <Switch>

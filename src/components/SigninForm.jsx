@@ -1,14 +1,5 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom';
-import axios from 'axios';
-import { connect } from 'react-redux';
-import {
-  setLoading,
-  endLoading,
-  setError,
-  clearError,
-  setToken,
-} from '../actions';
+import React, { useEffect } from 'react';
+// import { useHistory } from 'react-router-dom';
 import { message } from 'antd';
 import {
   StyledCol,
@@ -22,46 +13,31 @@ import {
   StyledButton,
 } from './styled';
 
-function SigninForm({
-  loading,
-  setLoading,
-  endLoading,
-  setError,
-  clearError,
-  setToken,
-}) {
+function SigninForm({ loading, error, login }) {
   const emailRef = React.createRef();
   const passwordRef = React.createRef();
-  const history = useHistory();
+  // const history = useHistory();
 
+  // login 요청 이후 store의 에러가 set되면
+  useEffect(() => {
+    if (!error) return;
+    else if (error === 'PASSWORD_NOT_MATCH') {
+      message.error('Incorrect Password');
+    } else if (error === 'USER_NOT_EXIST') {
+      message.error('User not found');
+    }
+  }, [error]);
+
+  // 질문 1. async 함수를 담는 함수에도 async를 붙여야되나?
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      clearError();
-      setLoading();
-      const email = emailRef.current.value;
-      const password = passwordRef.current.value;
-      const response = await axios.post('https://api.marktube.tv/v1/me', {
-        email,
-        password,
-      });
-      const { token } = response.data;
-      endLoading();
-      localStorage.setItem('token', token);
-      setToken(token);
-      history.push('/');
-    } catch (e) {
-      endLoading();
-      const { error } = e.response.data;
-      setError(error);
-      if (error === 'PASSWORD_NOT_MATCH') {
-        message.error('Incorrect Password');
-      } else if (error === 'USER_NOT_EXIST') {
-        message.error('User not found');
-      } else {
-        message.error('Sign in error');
-      }
-    }
+      await login(emailRef.current.value, passwordRef.current.value);
+      // history.push('/');
+      // 질문 2. 여기서 push를 안해도되는 이유는
+      // SigninForm의 props인 error 혹은 loading이 변경되므로
+      // re-render 될때 hoc에서 redirect가 되기 때문인가?
+    } catch {}
   }
 
   return (
@@ -91,30 +67,4 @@ function SigninForm({
   );
 }
 
-function mapStateToProps(state) {
-  return {
-    loading: state.loading,
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    setLoading: () => {
-      dispatch(setLoading());
-    },
-    endLoading: () => {
-      dispatch(endLoading());
-    },
-    setError: error => {
-      dispatch(setError(error));
-    },
-    clearError: () => {
-      dispatch(clearError());
-    },
-    setToken: token => {
-      dispatch(setToken(token));
-    },
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SigninForm);
+export default SigninForm;
