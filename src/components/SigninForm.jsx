@@ -1,120 +1,43 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Row, Col, message } from 'antd';
-import { useHistory } from 'react-router-dom';
-import axios from 'axios';
-import { useState } from 'react';
+import React, { useEffect } from 'react';
+// import { useHistory } from 'react-router-dom';
+import { message } from 'antd';
+import {
+  StyledCol,
+  StyledTitle,
+  StyledForm,
+  StyledLabel,
+  StyledInput,
+  SiginButton,
+  Underline,
+  StyledRow,
+  StyledButton,
+} from './styled';
 
-const StyledCol = styled(Col).attrs(() => ({
-  span: 12,
-}))`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-`;
-
-const StyledTitle = styled.div`
-  text-align: center;
-  font-size: 27px;
-  font-weight: bold;
-  text-transform: uppercase;
-`;
-
-const StyledForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  padding: 0 30px 30px 30px;
-  height: 400px;
-  justify-content: space-around;
-`;
-
-const StyledLabel = styled.label.attrs(({ htmlFor }) => ({
-  htmlFor,
-}))`
-  display: block;
-  font-weight: bold;
-  padding-bottom: 8px;
-
-  &::after {
-    content: '*';
-    color: red;
-  }
-`;
-
-const StyledInput = styled.input.attrs(({ id, type }) => ({
-  id,
-  type,
-}))`
-  width: 100%;
-  border-radius: 1px;
-  border-width: 1px;
-  font-family: Roboto;
-  padding-left: 5px;
-`;
-
-const SiginButton = styled.button.attrs(({ disabled }) => ({
-  disabled,
-}))`
-  width: 150px;
-  height: 50px;
-  background-color: #003366;
-  color: white;
-  font-size: 16px;
-  text-transform: uppercase;
-`;
-
-const Underline = styled.div`
-  height: 1px;
-  background: #ccc;
-`;
-
-const StyledRow = styled(Row).attrs(() => ({
-  type: 'flex',
-  justify: 'space-between',
-}))``;
-
-const StyledButton = styled.button`
-  height: 30px;
-  color: #003366;
-  background: transparent;
-  padding: 0 10px;
-  border: 2px solid #003366;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-`;
-
-function SigninForm() {
+function SigninForm({ loading, error, login }) {
   const emailRef = React.createRef();
   const passwordRef = React.createRef();
-  const history = useHistory();
-  const [loading, setLoading] = useState(false);
+  // const history = useHistory();
 
+  // login 요청 이후 store의 에러가 set되면
+  useEffect(() => {
+    if (!error) return;
+    else if (error === 'PASSWORD_NOT_MATCH') {
+      message.error('Incorrect Password');
+    } else if (error === 'USER_NOT_EXIST') {
+      message.error('User not found');
+    }
+  }, [error]);
+
+  // 질문 1. async 함수를 담는 함수에도 async를 붙여야되나?
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      setLoading(true);
-      const email = emailRef.current.value;
-      const password = passwordRef.current.value;
-      const response = await axios.post('https://api.marktube.tv/v1/me', {
-        email,
-        password,
-      });
-      const { token } = response.data;
-      setLoading(false);
-      localStorage.setItem('token', token);
-      history.push('/');
-    } catch (e) {
-      setLoading(false);
-      const { error } = e.response.data;
-      if (error === 'PASSWORD_NOT_MATCH') {
-        message.error('Incorrect Password');
-      } else if (error === 'USER_NOT_EXIST') {
-        message.error('User not found');
-      } else {
-        message.error('Sign in error');
-      }
-    }
+      await login(emailRef.current.value, passwordRef.current.value);
+      // history.push('/');
+      // 질문 2. 여기서 push를 안해도되는 이유는
+      // SigninForm의 props인 error 혹은 loading이 변경되므로
+      // re-render 될때 hoc에서 redirect가 되기 때문인가?
+    } catch {}
   }
 
   return (

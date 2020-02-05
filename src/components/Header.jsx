@@ -1,20 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
 
-function Header({ token, setToken }) {
-  async function removeToken() {
+function Header({ token, logout }) {
+  async function handleClick() {
     try {
-      await axios.delete('https://api.marktube.tv/v1/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      localStorage.removeItem('token');
-      setToken(false);
-    } catch (e) {
-      console.error(e);
-    }
+      await logout(token);
+    } catch {}
   }
 
   return (
@@ -33,7 +24,7 @@ function Header({ token, setToken }) {
             </NavLink>
           </li>
           <li>
-            <button onClick={removeToken}>로그아웃</button>
+            <button onClick={handleClick}>로그아웃</button>
           </li>
         </ul>
       </nav>

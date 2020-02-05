@@ -1,51 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import withAuth from '../hocs/withAuth.js';
-import Header from '../components/Header.jsx';
-import AddBookForm from '../components/AddBookForm.jsx';
+import HeaderContainer from '../components/containers/HeaderContainer';
+import BooksContainer from '../components/containers/BooksContainer';
+import AddBookFormContainer from '../components/containers/AddBookFormContainer';
+import { setBooksThunk } from '../actions/index.js';
+import { connect } from 'react-redux';
 
-function MyBooks({ token, setToken }) {
-  const [books, setBooks] = useState([]);
-  const [addBook, setAddBook] = useState(false);
+function MyBooks({ token, loading, error, setBooks }) {
+  const [bookForm, setBookForm] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get('https://api.marktube.tv/v1/book', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setBooks(data);
-      } catch (e) {
-        console.error(e);
-      }
+        await setBooks(token);
+      } catch {}
     })();
-  }, [token]);
+  }, [token, setBooks]);
 
   function handleAddButton() {
-    setAddBook(!addBook);
+    setBookForm(!bookForm);
   }
 
   return (
     <>
-      <Header token={token} setToken={setToken} />
+      <HeaderContainer />
       <section>
-        <h2>내 서재</h2>
-        <ul>
-          {books.map(book => (
-            <li key={book.bookId}>{book.title}</li>
-          ))}
-        </ul>
-        <div>
-          <button onClick={handleAddButton}>
-            {addBook ? '취소' : '책 추가하기'}
-          </button>
-          {addBook && <AddBookForm setBooks={setBooks} />}
-        </div>
+        <h2>내 서재 {loading && <span>로딩 중...</span>}</h2>
+        {error ? (
+          <div>요청에 실패했습니다.</div>
+        ) : (
+          <>
+            <BooksContainer />
+            <div>
+              <button onClick={handleAddButton}>
+                {bookForm ? '취소' : '책 추가하기'}
+              </button>
+              {bookForm && <AddBookFormContainer />}
+            </div>
+          </>
+        )}
       </section>
     </>
   );
 }
 
-export default withAuth(MyBooks);
+function mapStateToProps(state) {
+  return {
+    token: state.token,
+    loading: state.loading,
+    error: state.error,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    setBooks: token => {
+      dispatch(setBooksThunk(token));
+    },
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withAuth(MyBooks));

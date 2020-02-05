@@ -1,16 +1,18 @@
 import React from 'react';
 import withAuth from '../hocs/withAuth';
-import Header from '../components/Header';
+import HeaderContainer from '../components/containers/HeaderContainer';
 
-const Home = ({ token, setToken }) => (
-  <>
-    <Header token={token} setToken={setToken} />
-    <main>
-      <section>
-        <h2>홈</h2>
-      </section>
-    </main>
-  </>
-);
+function Home() {
+  return (
+    <>
+      <HeaderContainer />
+      <main>
+        <section>
+          <h2>홈</h2>
+        </section>
+      </main>
+    </>
+  );
+}
 
 export default withAuth(Home);
